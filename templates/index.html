@@ -8,19 +8,38 @@
 <body>
     <div class="container">
         <h1>Medical Image Preprocessor</h1>
+
+        <!-- Upload Form -->
         <form id="upload-form">
             <label for="imageInput">Select Medical Image:</label>
             <input type="file" id="imageInput" name="imageInput" accept="image/*" required>
-
-            <button type="submit">Upload</button>
         </form>
 
+        <!-- Image Preview -->
         <div id="preview">
             <h3>Preview</h3>
             <img id="previewImg" src="#" alt="Image preview will appear here" style="display: none;" />
         </div>
+
+        <!-- Transformation Grid -->
+        <div class="grid">
+            <button type="button" class="transform-btn" data-transform="rotate">Rotate Image</button>
+            <button type="button" class="transform-btn" data-transform="crop">Crop Image</button>
+            <button type="button" class="transform-btn" data-transform="scale">Scale Image</button>
+            <button type="button" class="transform-btn" data-transform="shear">Shear Image</button>
+            <button type="button" class="transform-btn" data-transform="flip">Flip Image</button>
+            <button type="button" class="transform-btn" data-transform="translate">Translate Image</button>
+        </div>
+
+        <!-- Input Area -->
+        <div id="input-area" style="display:none; margin-top: 20px;">
+            <h3 id="input-title"></h3>
+            <div id="input-fields"></div>
+            <button id="get-started-btn">Get Started</button>
+        </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <!-- JS should load after elements -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
