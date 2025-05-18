@@ -15,10 +15,13 @@
             <input type="file" id="imageInput" name="imageInput" accept="image/*" required>
         </form>
 
-        <!-- Image Preview -->
-        <div id="preview">
-            <h3>Preview</h3>
-            <img id="previewImg" src="#" alt="Image preview will appear here" style="display: none;" />
+        <!-- Button to view original image -->
+        <button type="button" id="view-original-btn" style="margin-top:10px;">View Original Image</button>
+
+        <!-- Image Preview (hidden until button click) -->
+        <div id="preview" style="display:none;">
+            <h3>Original Image</h3>
+            <img id="previewImg" src="#" alt="Image preview will appear here" style="max-width: 300px;" />
         </div>
 
         <!-- Transformation Grid -->
@@ -37,9 +40,14 @@
             <div id="input-fields"></div>
             <button id="get-started-btn">Get Started</button>
         </div>
+
+        <!-- Processed Image Section -->
+        <div id="processed-section" style="display: none; margin-top: 20px;">
+            <h3>Processed Image</h3>
+            <img id="processedImg" src="#" alt="Processed Image" style="max-width: 300px;" />
+        </div>
     </div>
 
-    <!-- JS should load after elements -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
