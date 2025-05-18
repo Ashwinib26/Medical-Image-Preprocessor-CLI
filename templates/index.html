@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Medical Image Preprocessor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Medical Image Preprocessor</h1>
+        <form id="upload-form">
+            <label for="imageInput">Select Medical Image:</label>
+            <input type="file" id="imageInput" name="imageInput" accept="image/*" required>
+
+            <button type="submit">Upload</button>
+        </form>
+
+        <div id="preview">
+            <h3>Preview</h3>
+            <img id="previewImg" src="#" alt="Image preview will appear here" style="display: none;" />
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
