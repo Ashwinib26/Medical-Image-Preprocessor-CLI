@@ -4,37 +4,39 @@
   <meta charset="UTF-8">
   <title>Medical Image Preprocessor</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
 </head>
 <body>
   <div class="container">
-    <h1>Medical Image Preprocessor</h1>
+    <h1>🧬 Medical Image Preprocessor</h1>
 
-    <div class="upload-section">
+    <div class="card upload-section">
       <input type="file" id="imageInput" accept="image/*">
       <button id="view-original-btn">View Original Image</button>
     </div>
 
-    <div id="preview" class="image-section" style="display:none;">
+    <div id="preview" class="card image-section" style="display:none;">
       <h3>Original Image</h3>
       <img id="previewImg" src="#" alt="Original" />
     </div>
 
-    <div class="transform-grid">
-      <button class="transform-btn" data-transform="rotate">Rotate</button>
-      <button class="transform-btn" data-transform="scale">Scale</button>
-      <button class="transform-btn" data-transform="translate">Translate</button>
-      <button class="transform-btn" data-transform="shear">Shear</button>
-      <button class="transform-btn" data-transform="flip">Flip</button>
-      <button class="transform-btn" data-transform="crop">Crop</button>
+    <div class="carousel">
+      <button class="transform-btn" data-transform="rotate">🔄 Rotate</button>
+      <button class="transform-btn" data-transform="scale">📏 Scale</button>
+      <button class="transform-btn" data-transform="translate">🧭 Translate</button>
+      <button class="transform-btn" data-transform="shear">📐 Shear</button>
+      <button class="transform-btn" data-transform="flip">↔️ Flip</button>
+      <button class="transform-btn" data-transform="crop">✂️ Crop</button>
     </div>
 
-    <div id="input-area" style="display:none;">
+    <div id="input-area" class="card" style="display:none;">
       <h3 id="input-title"></h3>
       <div id="input-fields"></div>
       <button id="get-started-btn">Get Started</button>
     </div>
 
-    <div id="output-area" class="image-section" style="display:none;">
+    <div id="output-area" class="card image-section" style="display:none;">
       <h3>Processed Image</h3>
       <img id="processedImg" src="#" alt="Processed" />
     </div>
