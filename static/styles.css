@@ -1,69 +1,49 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    padding: 2rem;
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  padding: 20px;
+  margin: 0;
+  text-align: center;
 }
 
 .container {
-    max-width: 900px;
-    margin: auto;
-    padding: 2rem;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  max-width: 800px;
+  margin: auto;
+  padding: 20px;
+  background-color: white;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 2rem;
+.upload-section {
+  margin-bottom: 20px;
 }
 
-form {
-    margin-bottom: 2rem;
+button {
+  margin: 8px;
+  padding: 10px 16px;
+  border: none;
+  background-color: #007BFF;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+button:hover {
+  background-color: #0056b3;
 }
 
-.transform-btn {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 1rem;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
+.image-section img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-.transform-btn:hover {
-    background-color: #0056b3;
-}
-
-#input-area {
-    margin-top: 20px;
-    padding: 1rem;
-    background-color: #eef2f7;
-    border-radius: 8px;
-}
-
-#input-fields input,
-#input-fields select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-#get-started-btn {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
+.transform-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin: 20px 0;
 }

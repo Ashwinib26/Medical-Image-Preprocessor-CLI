@@ -1,53 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Medical Image Preprocessor</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <meta charset="UTF-8">
+  <title>Medical Image Preprocessor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Medical Image Preprocessor</h1>
+  <div class="container">
+    <h1>Medical Image Preprocessor</h1>
 
-        <!-- Upload Form -->
-        <form id="upload-form">
-            <label for="imageInput">Select Medical Image:</label>
-            <input type="file" id="imageInput" name="imageInput" accept="image/*" required>
-        </form>
-
-        <!-- Button to view original image -->
-        <button type="button" id="view-original-btn" style="margin-top:10px;">View Original Image</button>
-
-        <!-- Image Preview (hidden until button click) -->
-        <div id="preview" style="display:none;">
-            <h3>Original Image</h3>
-            <img id="previewImg" src="#" alt="Image preview will appear here" style="max-width: 300px;" />
-        </div>
-
-        <!-- Transformation Grid -->
-        <div class="grid">
-            <button type="button" class="transform-btn" data-transform="rotate">Rotate Image</button>
-            <button type="button" class="transform-btn" data-transform="crop">Crop Image</button>
-            <button type="button" class="transform-btn" data-transform="scale">Scale Image</button>
-            <button type="button" class="transform-btn" data-transform="shear">Shear Image</button>
-            <button type="button" class="transform-btn" data-transform="flip">Flip Image</button>
-            <button type="button" class="transform-btn" data-transform="translate">Translate Image</button>
-        </div>
-
-        <!-- Input Area -->
-        <div id="input-area" style="display:none; margin-top: 20px;">
-            <h3 id="input-title"></h3>
-            <div id="input-fields"></div>
-            <button id="get-started-btn">Get Started</button>
-        </div>
-
-        <!-- Processed Image Section -->
-        <div id="processed-section" style="display: none; margin-top: 20px;">
-            <h3>Processed Image</h3>
-            <img id="processedImg" src="#" alt="Processed Image" style="max-width: 300px;" />
-        </div>
+    <div class="upload-section">
+      <input type="file" id="imageInput" accept="image/*">
+      <button id="view-original-btn">View Original Image</button>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <div id="preview" class="image-section" style="display:none;">
+      <h3>Original Image</h3>
+      <img id="previewImg" src="#" alt="Original" />
+    </div>
+
+    <div class="transform-grid">
+      <button class="transform-btn" data-transform="rotate">Rotate</button>
+      <button class="transform-btn" data-transform="scale">Scale</button>
+      <button class="transform-btn" data-transform="translate">Translate</button>
+      <button class="transform-btn" data-transform="shear">Shear</button>
+      <button class="transform-btn" data-transform="flip">Flip</button>
+      <button class="transform-btn" data-transform="crop">Crop</button>
+    </div>
+
+    <div id="input-area" style="display:none;">
+      <h3 id="input-title"></h3>
+      <div id="input-fields"></div>
+      <button id="get-started-btn">Get Started</button>
+    </div>
+
+    <div id="output-area" class="image-section" style="display:none;">
+      <h3>Processed Image</h3>
+      <img id="processedImg" src="#" alt="Processed" />
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
