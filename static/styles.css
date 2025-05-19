@@ -1,0 +1,112 @@
+body {
+  font-family: 'Rubik', sans-serif;
+  background: linear-gradient(to right, #dfe9f3, #ffffff);
+  margin: 0;
+  padding: 20px;
+  color: #2d3e50;
+}
+
+.container {
+  max-width: 950px;
+  margin: auto;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  color: #0059b3;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 6px 18px rgba(0, 89, 179, 0.1);
+  text-align: center;
+}
+
+input[type="file"] {
+  margin-bottom: 15px;
+  border: 1px solid #0059b3;
+  padding: 10px;
+  border-radius: 6px;
+  background-color: #f0f8ff;
+}
+
+button {
+  background-color: #007BFF;
+  color: white;
+  padding: 12px 24px;
+  margin: 10px 5px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.image-section img {
+  max-width: 100%;
+  border-radius: 12px;
+  border: 3px solid #007BFF;
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.15);
+}
+
+.carousel {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding: 15px 0;
+  margin: 20px 0;
+  scroll-snap-type: x mandatory;
+}
+
+.carousel::-webkit-scrollbar {
+  height: 8px;
+}
+
+.carousel::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 8px;
+}
+
+.transform-btn {
+  flex: 0 0 auto;
+  scroll-snap-align: center;
+  min-width: 130px;
+  background-color: #17a2b8;
+}
+
+.transform-btn:hover {
+  background-color: #117a8b;
+}
+
+#input-fields label {
+  display: block;
+  margin: 12px auto;
+}
+
+#input-fields input,
+#input-fields select {
+  padding: 8px;
+  width: 60%;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+#get-started-btn {
+  background-color: #28a745;
+}
+
+#get-started-btn:hover {
+  background-color: #218838;
+}
