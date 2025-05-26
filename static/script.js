@@ -1,88 +1,145 @@
-let uploadedFilename = null;
+let originalImageFile = null;
+let currentTransform = null;
 
-document.getElementById('imageInput').addEventListener('change', async function () {
-  const file = this.files[0];
-  const formData = new FormData();
-  formData.append('image', file);
+// Preview image and store it
+document.getElementById('imageInput').addEventListener('change', function () {
+    const file = this.files[0];
+    if (file) {
+        originalImageFile = file;
 
-  const res = await fetch('/uploads', {
-    method: 'POST',
-    body: formData,
-  });
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const previewImg = document.getElementById('previewImg');
+            previewImg.src = e.target.result;
+            document.getElementById('preview').style.display = 'block';
 
-  const data = await res.json();
-  uploadedFilename = data.filename;
+            // Hide output image
+            document.getElementById('output-area').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
 });
 
-document.getElementById('view-original-btn').addEventListener('click', function () {
-  if (uploadedFilename) {
-    const imgUrl = `/static/uploads/${uploadedFilename}`;
-    document.getElementById('previewImg').src = imgUrl;
+// View original image
+document.getElementById('view-original-btn').addEventListener('click', () => {
+    if (!originalImageFile) {
+        alert("Please upload an image first.");
+        return;
+    }
     document.getElementById('preview').style.display = 'block';
-  } else {
-    alert('Please upload an image first.');
-  }
 });
 
+// Show inputs dynamically when a transform is selected
 document.querySelectorAll('.transform-btn').forEach(btn => {
-  btn.addEventListener('click', function () {
-    const type = this.dataset.transform;
-    const inputArea = document.getElementById('input-area');
-    const inputFields = document.getElementById('input-fields');
-    const inputTitle = document.getElementById('input-title');
+    btn.addEventListener('click', () => {
+        currentTransform = btn.getAttribute('data-transform');
+        const inputFields = document.getElementById('input-fields');
+        const inputTitle = document.getElementById('input-title');
 
-    inputArea.style.display = 'block';
-    inputTitle.innerText = `Enter Parameters for ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-    inputFields.innerHTML = '';
+        inputFields.innerHTML = '';
+        inputTitle.textContent = `Apply ${currentTransform.charAt(0).toUpperCase() + currentTransform.slice(1)} Transformation`;
 
-    if (type === 'rotate') {
-      inputFields.innerHTML = `<label>Angle: <input type="number" name="angle" value="0" /></label>`;
-    } else if (type === 'scale') {
-      inputFields.innerHTML = `
-        <label>fx: <input type="number" step="0.1" name="fx" value="1" /></label>
-        <label>fy: <input type="number" step="0.1" name="fy" value="1" /></label>`;
-    } else if (type === 'translate') {
-      inputFields.innerHTML = `
-        <label>tx: <input type="number" name="tx" value="0" /></label>
-        <label>ty: <input type="number" name="ty" value="0" /></label>`;
-    } else if (type === 'shear') {
-      inputFields.innerHTML = `<label>Shear Value: <input type="number" step="0.1" name="shear" value="0" /></label>`;
-    } else if (type === 'flip') {
-      inputFields.innerHTML = `
-        <label>Mode: 
-          <select name="mode">
-            <option value="horizontal">Horizontal</option>
-            <option value="vertical">Vertical</option>
-          </select>
-        </label>`;
-    } else if (type === 'crop') {
-      inputFields.innerHTML = `
-        <label>X: <input type="number" name="x" value="0" /></label>
-        <label>Y: <input type="number" name="y" value="0" /></label>
-        <label>W: <input type="number" name="w" value="100" /></label>
-        <label>H: <input type="number" name="h" value="100" /></label>`;
+        // Dynamically generate fields
+        switch (currentTransform) {
+            case 'rotate':
+                inputFields.innerHTML = `<label>Angle (degrees):</label><input type="number" name="rotate" required>`;
+                break;
+            case 'scale':
+                inputFields.innerHTML = `<label>Scale Factor:</label><input type="number" name="scale" step="0.1" required>`;
+                break;
+            case 'translate':
+                inputFields.innerHTML = `
+                    <label>Translate X (px):</label><input type="number" name="translate_x" required>
+                    <label>Translate Y (px):</label><input type="number" name="translate_y" required>`;
+                break;
+            case 'shear':
+                inputFields.innerHTML = `
+                    <label>Shear X:</label><input type="number" name="shear_x" step="0.1" required>
+                    <label>Shear Y:</label><input type="number" name="shear_y" step="0.1" required>`;
+                break;
+            case 'flip':
+                inputFields.innerHTML = `
+                    <label>Flip Axis:</label>
+                    <select name="flip">
+                        <option value="horizontal">Horizontal</option>
+                        <option value="vertical">Vertical</option>
+                    </select>`;
+                break;
+            case 'crop':
+                inputFields.innerHTML = `
+                    <label>X:</label><input type="number" name="crop_x" required>
+                    <label>Y:</label><input type="number" name="crop_y" required>
+                    <label>Width:</label><input type="number" name="crop_w" required>
+                    <label>Height:</label><input type="number" name="crop_h" required>`;
+                break;
+        }
+
+        document.getElementById('input-area').style.display = 'block';
+    });
+});
+
+// Get Started (send transformation request)
+document.getElementById('get-started-btn').addEventListener('click', () => {
+    if (!originalImageFile || !currentTransform) {
+        alert("Please upload an image and select a transformation.");
+        return;
     }
 
-    document.getElementById('get-started-btn').onclick = async () => {
-      const inputs = inputFields.querySelectorAll('input, select');
-      const params = {};
-      inputs.forEach(input => {
-        params[input.name] = input.value;
-      });
+    const formData = new FormData();
+    formData.append('image', originalImageFile);
 
-      const res = await fetch('/processed', {
+    const inputs = document.querySelectorAll('#input-fields input, #input-fields select');
+    inputs.forEach(input => {
+        if (input.value !== '') {
+            formData.append(input.name, input.value);
+        }
+    });
+
+    fetch('/transform', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filename: uploadedFilename,
-          action: type,
-          params
-        })
-      });
+        body: formData
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Transformation failed.");
+        return res.blob();
+    })
+    .then(blob => {
+        const outputImg = document.getElementById('processedImg');
+        outputImg.src = URL.createObjectURL(blob);
+        document.getElementById('output-area').style.display = 'block';
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Transformation failed.");
+    });
+});
 
-      const result = await res.json();
-      document.getElementById('processedImg').src = `/${result.processed_image}`;
-      document.getElementById('output-area').style.display = 'block';
-    };
-  });
+// Reset Image (send original back)
+document.getElementById('reset-button').addEventListener('click', () => {
+    if (!originalImageFile) {
+        alert("Please upload an image first.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', originalImageFile);
+    formData.append('reset', 'true');
+
+    fetch('/transform', {
+        method: 'POST',
+        body: formData
+    })
+    .then(res => {
+        if (!res.ok) throw new Error("Reset failed.");
+        return res.blob();
+    })
+    .then(blob => {
+        const outputImg = document.getElementById('processedImg');
+        outputImg.src = URL.createObjectURL(blob);
+        document.getElementById('output-area').style.display = 'block';
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Reset failed.");
+    });
 });
