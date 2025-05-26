@@ -39,13 +39,13 @@ document.querySelectorAll('.transform-btn').forEach(btn => {
         inputFields.innerHTML = '';
         inputTitle.textContent = `Apply ${currentTransform.charAt(0).toUpperCase() + currentTransform.slice(1)} Transformation`;
 
-        // Dynamically generate fields
+        // Dynamically generate fields with parameter names matching app.py
         switch (currentTransform) {
             case 'rotate':
-                inputFields.innerHTML = `<label>Angle (degrees):</label><input type="number" name="rotate" required>`;
+                inputFields.innerHTML = `<label>Angle (degrees):</label><input type="number" name="rotate_angle" required>`;
                 break;
             case 'scale':
-                inputFields.innerHTML = `<label>Scale Factor:</label><input type="number" name="scale" step="0.1" required>`;
+                inputFields.innerHTML = `<label>Scale Factor:</label><input type="number" name="scale_factor" step="0.1" required>`;
                 break;
             case 'translate':
                 inputFields.innerHTML = `
@@ -60,17 +60,17 @@ document.querySelectorAll('.transform-btn').forEach(btn => {
             case 'flip':
                 inputFields.innerHTML = `
                     <label>Flip Axis:</label>
-                    <select name="flip">
+                    <select name="flip_mode">
                         <option value="horizontal">Horizontal</option>
                         <option value="vertical">Vertical</option>
                     </select>`;
                 break;
             case 'crop':
                 inputFields.innerHTML = `
-                    <label>X:</label><input type="number" name="crop_x" required>
-                    <label>Y:</label><input type="number" name="crop_y" required>
-                    <label>Width:</label><input type="number" name="crop_w" required>
-                    <label>Height:</label><input type="number" name="crop_h" required>`;
+                    <label>Left (X):</label><input type="number" name="crop_left" required>
+                    <label>Top (Y):</label><input type="number" name="crop_top" required>
+                    <label>Right (X):</label><input type="number" name="crop_right" required>
+                    <label>Bottom (Y):</label><input type="number" name="crop_bottom" required>`;
                 break;
         }
 
@@ -85,61 +85,59 @@ document.getElementById('get-started-btn').addEventListener('click', () => {
         return;
     }
 
-    const formData = new FormData();
-    formData.append('image', originalImageFile);
+    // Step 1: Upload image
+    const uploadForm = new FormData();
+    uploadForm.append('image', originalImageFile);
 
-    const inputs = document.querySelectorAll('#input-fields input, #input-fields select');
-    inputs.forEach(input => {
-        if (input.value !== '') {
-            formData.append(input.name, input.value);
-        }
-    });
-
-    fetch('/transform', {
+    fetch('/upload', {  // Changed from '/uploads' to '/upload' to match backend
         method: 'POST',
-        body: formData
+        body: uploadForm
     })
-    .then(res => {
-        if (!res.ok) throw new Error("Transformation failed.");
-        return res.blob();
+    .then(res => res.json())
+    .then(data => {
+        if (!data.filename) throw new Error("Upload failed");
+
+        // Step 2: Prepare transformation data
+        const params = {};
+        const inputs = document.querySelectorAll('#input-fields input, #input-fields select');
+        inputs.forEach(input => {
+            params[input.name] = input.value; // Use exact input names
+        });
+
+        return fetch('/process', {  // Changed from '/processed' to '/process'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                filename: data.filename,
+                action: currentTransform,
+                params: params
+            })
+        });
     })
-    .then(blob => {
+    .then(res => res.json())
+    .then(data => {
+        if (!data.processed_image) throw new Error("Processing failed");
+
         const outputImg = document.getElementById('processedImg');
-        outputImg.src = URL.createObjectURL(blob);
+        outputImg.src = data.processed_image;
         document.getElementById('output-area').style.display = 'block';
     })
     .catch(err => {
         console.error(err);
-        alert("Transformation failed.");
+        alert("Something went wrong. Try again.");
     });
 });
 
 // Reset Image (send original back)
 document.getElementById('reset-button').addEventListener('click', () => {
-    if (!originalImageFile) {
-        alert("Please upload an image first.");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('image', originalImageFile);
-    formData.append('reset', 'true');
-
-    fetch('/transform', {
-        method: 'POST',
-        body: formData
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Reset failed.");
-        return res.blob();
-    })
-    .then(blob => {
-        const outputImg = document.getElementById('processedImg');
-        outputImg.src = URL.createObjectURL(blob);
-        document.getElementById('output-area').style.display = 'block';
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Reset failed.");
-    });
+    document.getElementById('preview').style.display = 'none';
+    document.getElementById('input-area').style.display = 'none';
+    document.getElementById('output-area').style.display = 'none';
+    document.getElementById('imageInput').value = '';
+    document.getElementById('processedImg').src = '';  
+    originalImageFile = null;
+    currentTransform = null;
 });
+

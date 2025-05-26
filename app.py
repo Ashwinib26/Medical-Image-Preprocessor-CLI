@@ -1,107 +1,96 @@
-from flask import Flask, render_template, request, jsonify
-import os
-import cv2
-import numpy as np
+from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
+from PIL import Image, ImageOps
+import os
 
 app = Flask(__name__)
+
 UPLOAD_FOLDER = 'static/uploads'
-RESULT_FOLDER = 'static/processed'
-
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['RESULT_FOLDER'] = RESULT_FOLDER
 
+# Ensure upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(RESULT_FOLDER, exist_ok=True)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/uploads', methods=['POST'])
+@app.route('/upload', methods=['POST'])
 def upload():
-    if 'image' not in request.files:
-        return jsonify({'error': 'No image part in request'}), 400
-
     file = request.files['image']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
+    if file:
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+        return jsonify({'filename': filename})
+    return jsonify({'error': 'No file uploaded'}), 400
 
-    filename = secure_filename(file.filename)
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(filepath)
-    return jsonify({'filename': filename})
-
-@app.route('/processed', methods=['POST'])
+@app.route('/process', methods=['POST'])
 def process():
-    data = request.json
+    data = request.get_json()
     filename = data.get('filename')
     action = data.get('action')
     params = data.get('params', {})
 
-    if not filename or not action:
-        return jsonify({'error': 'Missing filename or action'}), 400
+    print(f"Action: {action}, Params: {params}")  # Debug line
 
-    image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    if not os.path.exists(image_path):
-        return jsonify({'error': 'File not found'}), 404
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    processed_filename = f"processed_{filename}"
+    processed_path = os.path.join(app.config['UPLOAD_FOLDER'], processed_filename)
 
-    img = cv2.imread(image_path)
+    try:
+        image = Image.open(filepath)
 
-    if action == 'rotate':
-        angle = float(params.get('angle', 0))
-        (h, w) = img.shape[:2]
-        M = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1)
-        img = cv2.warpAffine(img, M, (w, h))
+        if action == 'rotate':
+            angle = float(params.get('rotate_angle', 0))
+            processed_img = image.rotate(angle, expand=True)
 
-    elif action == 'scale':
-        fx = float(params.get('fx', 1))
-        fy = float(params.get('fy', 1))
-        img = cv2.resize(img, None, fx=fx, fy=fy, interpolation=cv2.INTER_LINEAR)
+        elif action == 'scale':
+            factor = float(params.get('scale_factor', 1))
+            new_size = (int(image.width * factor), int(image.height * factor))
+            processed_img = image.resize(new_size)
 
-    elif action == 'translate':
-        tx = int(params.get('tx', 0))
-        ty = int(params.get('ty', 0))
-        M = np.float32([[1, 0, tx], [0, 1, ty]])
-        img = cv2.warpAffine(img, M, (img.shape[1], img.shape[0]))
+        elif action == 'translate':
+            tx = int(params.get('translate_x', 0))
+            ty = int(params.get('translate_y', 0))
+            processed_img = Image.new("RGB", image.size)
+            processed_img.paste(image, (tx, ty))
 
-    elif action == 'shear':
-        shear_val = float(params.get('shear', 0))
-        M = np.float32([[1, shear_val, 0], [0, 1, 0]])
-        img = cv2.warpAffine(img, M, (img.shape[1], img.shape[0]))
+        elif action == 'shear':
+            shear_x = float(params.get('shear_x', 0))
+            shear_y = float(params.get('shear_y', 0))
+            matrix = (1, shear_x, 0, shear_y, 1, 0)
+            processed_img = image.transform(image.size, Image.AFFINE, matrix)
 
-    elif action == 'flip':
-        mode = params.get('mode')
-        flip_code = 1 if mode == 'horizontal' else 0
-        img = cv2.flip(img, flip_code)
+        elif action == 'flip':
+            flip_mode = params.get('flip_mode')
+            if flip_mode == 'horizontal':
+                processed_img = ImageOps.mirror(image)
+            elif flip_mode == 'vertical':
+                processed_img = ImageOps.flip(image)
+            else:
+                return jsonify({'error': 'Invalid flip mode'}), 400
 
-    elif action == 'crop':
-        x = int(params.get('x', 0))
-        y = int(params.get('y', 0))
-        w = int(params.get('w', img.shape[1]))
-        h = int(params.get('h', img.shape[0]))
-        img = img[y:y+h, x:x+w]
+        elif action == 'crop':
+            left = int(params.get('crop_left', 0))
+            top = int(params.get('crop_top', 0))
+            right = int(params.get('crop_right', image.width))
+            bottom = int(params.get('crop_bottom', image.height))
+            processed_img = image.crop((left, top, right, bottom))
 
-    elif action == 'colormap':
-        cmap = params.get('cmap', 'JET').upper()
-        colormaps = {
-            'JET': cv2.COLORMAP_JET,
-            'HOT': cv2.COLORMAP_HOT,
-            'COOL': cv2.COLORMAP_COOL,
-            'BONE': cv2.COLORMAP_BONE,
-        }
-        if cmap in colormaps:
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            img = cv2.applyColorMap(gray, colormaps[cmap])
+        else:
+            return jsonify({'error': 'Invalid action'}), 400
 
-    else:
-        return jsonify({'error': f'Unknown transformation: {action}'}), 400
+        processed_img.save(processed_path)
+        return jsonify({'processed_image': f'/{processed_path}'})
 
-    out_filename = f'processed_{action}_{filename}'
-    out_path = os.path.join(app.config['RESULT_FOLDER'], out_filename)
-    cv2.imwrite(out_path, img)
+    except Exception as e:
+        print("Processing error:", e)
+        return jsonify({'error': str(e)}), 500
 
-    return jsonify({'processed_image': out_path})
+@app.route('/static/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
