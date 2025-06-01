@@ -1,3 +1,4 @@
+# app.py
 from flask import Flask, render_template, request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
 from PIL import Image, ImageOps
@@ -39,6 +40,7 @@ def process():
     processed_path = os.path.join(app.config['UPLOAD_FOLDER'], processed_filename)
 
     try:
+        # Always load the original uploaded image
         image = Image.open(filepath)
 
         if action == 'rotate':
