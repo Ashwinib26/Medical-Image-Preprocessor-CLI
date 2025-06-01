@@ -1,6 +1,6 @@
 # 🩺 Medical Image Preprocessor Web App
 
-This is a web-based application built with **Flask**, **OpenCV**, **HTML/CSS/JS** that allows users to upload medical images and perform common preprocessing operations like **rotation, scaling, translation, shearing, flipping, cropping**, and **colormap application**. The goal is to make image preprocessing interactive and accessible for medical imaging use cases.
+This is a web-based application built with **Flask**, **OpenCV**, **HTML/CSS/JS** that allows users to upload medical images and perform common preprocessing operations like **rotation, scaling, translation, shearing, flipping, cropping**,etc. The goal is to make image preprocessing interactive and accessible for medical imaging use cases.
 
 ---
 
@@ -114,19 +114,17 @@ Doctors, radiologists, or medical researchers can use this app to:
 
 ---
 
-## 🧑‍💻 Developer Notes
+## 🔮 Future Enhancements
 
-* All image transformations are performed using **OpenCV** on the server side.
-* Processed images are saved temporarily in the `/static/processed/` folder.
-* You can extend this to support additional processing (e.g., brightness/contrast adjustment, denoising).
+- Support for DICOM (.dcm) medical image formats  
+- AI-powered auto enhancement and preprocessing pipeline  
+- Session Management option and transformation history tracking  
+
+---
+## 🧑‍💻 Developer Notes
 
 #### NOTE : I have also attached a jupyter notebook file (Medical_Image_Preprocessor.ipynb) which illustrates actual working of each tranformation in backend for better understanding of the operations.
 
----
-
-## ⚠️ Limitations
-
-* Images are not permanently stored (sessions are temporary)
 
 ---
 
@@ -142,7 +140,7 @@ Doctors, radiologists, or medical researchers can use this app to:
 
 ## 🙋‍♀️ Support
 
-For questions or suggestions, open an [Issue](https://github.com/your-username/medical-image-preprocessor/issues) or contact [ashwinisbisen@gmail.com](mailto:ashwinisbisen@gmail.com).
+For questions or suggestions, open an [Issue] or contact [ashwinisbisen@gmail.com](mailto:ashwinisbisen@gmail.com).
 
 ---
 
@@ -153,3 +151,4 @@ For questions or suggestions, open an [Issue](https://github.com/your-username/m
 * [Freepik & Unsplash](https://www.freepik.com/) (for medical image samples)
 
 ---
+## THANK YOU !!
